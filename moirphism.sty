@@ -1,0 +1,114 @@
+% moirphism.sty
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{xparse}
+\usepackage{xifthen}
+
+\tikzset{ 
+    wire/.style={rounded corners=3, line width=.5pt}
+	, iden/.style={line width=.5pt}
+	, dot/.style={draw,fill=black, circle, inner sep=1pt}
+	, wdot/.style={draw,fill=white, circle, inner sep=1pt}
+	, cdot/.style={draw,fill=#1, circle, inner sep=1pt}
+    , box/.style={pos=.5,font=\tiny,draw, rounded corners=3, inner sep=1.5pt}
+	, tag/.style={draw, inner sep=1.5pt}
+	, wtag/.style={fill=white,tag, font=\tiny}
+  , baseline=(current bounding box.center)
+}
+
+\newcounter{moirphismi}
+\setcounter{moirphismi}{0}
+\newcounter{moirphismj}
+\setcounter{moirphismj}{0}
+
+\def\SW{(-0.5,-0.5)}
+\def\NW{(-0.5,+0.5)}
+\def\NE{(+0.5,-0.5)}
+\def\SE{(+0.5,+0.5)}
+
+\def\L{(-0.5,0)}
+\def\R{(+0.5,0)}
+\def\T{(0,+0.5)}
+\def\B{(0,-0.5)}
+
+\def\LU{(-0.5,+0.25)}
+\def\LD{(-0.5,-0.25)}
+
+\def\RU{(+0.5,+0.25)}
+\def\RD{(+0.5,-0.25)}
+
+\def\TL{(-0.25,+0.5)}
+\def\TR{(+0.25,+0.5)}
+
+\def\BL{(-0.25,-0.5)}
+\def\BR{(+0.25,-0.5)}
+
+\def\CL{(-0.25,0)}
+\def\CR{(+0.25,0)}
+\def\CU{(0,+0.25)}
+\def\CD{(0,-0.25)}
+
+\def\CNW{(-0.25,+0.25)}
+\def\CNE{(+0.25,+0.25)}
+\def\CSE{(+0.25,-0.25)}
+\def\CSW{(-0.25,-0.25)}
+
+\def\C{(0,0)}
+
+\RenewDocumentCommand{\>}{}{%
+    \stepcounter{moirphismi}%
+    \setcounter{moirphismj}{0}%
+}
+
+% @height
+% @width
+\NewDocumentCommand{\wrapmoirphism}{m O{1} D<>{1}}{
+    \ifodd #2 \def\offsety{0}
+    \else     \def\offsety{(#2-1)/2} \fi
+    \ifodd #3 \def\offsetx{0}
+    \else     \def\offsetx{(#3-1)/2} \fi
+    \begin{scope}[
+        xshift= 0.5cm+1cm*(\themoirphismj + \offsetx),
+        yshift=-0.5cm-1cm*(\themoirphismi + \offsety),
+        xscale=#3,
+        yscale={max(#2,2*#2-2)}]
+        #1
+    \end{scope}
+    \addtocounter{moirphismj}{#3}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% The empty diagram.
+\RenewDocumentCommand{\_}{}{
+    \wrapmoirphism{}
+}
+% The wire.
+\RenewDocumentCommand{\~}{}{
+    \wrapmoirphism{
+        \draw[wire] \L -- \R;
+    }
+}
+\NewDocumentCommand{\mor}{O{}O{}}{
+    \wrapmoirphism{
+        \draw[draw=none] \SW rectangle \NE;
+        \draw[wire] \L -- \R;
+        \node[tag, fill=#2, font=\tiny] at \C {$#1$};    
+    }
+}
+\NewDocumentCommand{\mul}{m}{
+    \wrapmoirphism{
+        \draw[wire] \C -- \R;
+        \draw[wire] \LU -| \CD -- \LD;
+        \node[cdot=#1] at \C {};
+    }
+}
+\NewDocumentCommand{\comul}{m}{
+    \wrapmoirphism{
+        \draw[wire] \RU -| \CD -- \RD;
+        \draw[wire] \L -- \C;
+        \node[cdot=#1] at \C {};
+    }
+}
